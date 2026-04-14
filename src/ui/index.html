@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌤️ Meteo Esercizio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ddd;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .result {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .city-name {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .weather-info {
+            display: grid;
+            gap: 15px;
+        }
+
+        .weather-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .weather-item-label {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .weather-item-value {
+            color: #333;
+            font-size: 1.1em;
+            font-weight: 700;
+        }
+
+        .temperature {
+            font-size: 2em;
+            color: #ff6b6b;
+        }
+
+        .description {
+            color: #667eea;
+        }
+
+        .error {
+            background: #ffe0e0;
+            border-left-color: #ff6b6b;
+            color: #cc0000;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .cache-info {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        .cache-badge {
+            display: inline-block;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-left: 10px;
+            font-weight: 600;
+        }
+
+        .quick-suggestions {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            padding: 8px 12px;
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌤️ Meteo</h1>
+        <p class="subtitle">Scopri il meteo attuale della tua città</p>
+
+        <div class="search-box">
+            <input 
+                type="text" 
+                id="cityInput" 
+                placeholder="Inserisci il nome della città..." 
+                autocomplete="off"
+            >
+            <button id="searchBtn">Cerca</button>
+        </div>
+
+        <div class="quick-suggestions">
+            <button class="quick-btn" onclick="searchCity('Roma')">Roma</button>
+            <button class="quick-btn" onclick="searchCity('Milano')">Milano</button>
+            <button class="quick-btn" onclick="searchCity('Londra')">Londra</button>
+            <button class="quick-btn" onclick="searchCity('Parigi')">Parigi</button>
+            <button class="quick-btn" onclick="searchCity('New York')">New York</button>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <span class="spinner"></span> Cerco il meteo...
+        </div>
+
+        <div id="result" class="result">
+            <div class="city-name" id="resultCity"></div>
+            <div class="weather-info">
+                <div class="weather-item">
+                    <span class="weather-item-label">🌡️ Temperatura</span>
+                    <span class="weather-item-value temperature" id="resultTemp"></span>
+                </div>
+                <div class="weather-item">
+                    <span class="weather-item-label">☁️ Condizioni</span>
+                    <span class="weather-item-value description" id="resultDescription"></span>
+                </div>
+            </div>
+            <div class="cache-info" id="cacheInfo"></div>
+        </div>
+
+        <div id="error" class="error">
+            <strong>❌ Errore:</strong> <span id="errorMessage"></span>
+        </div>
+    </div>
+
+    <script type="module">
+        // Importiamo la funzione per ottenere il meteo
+        import { getWeatherByCity } from '../models/weather_model.js';
+
+        // Elementi HTML che modificheremo
+        const cityInput = document.getElementById('cityInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        const error = document.getElementById('error');
+
+        // Quando l'utente clicca il bottone "Cerca"
+        searchBtn.addEventListener('click', () => {
+            const city = cityInput.value.trim();
+            if (city) {
+                searchCity(city);
+            } else {
+                showError('Per favore, inserisci il nome di una città');
+            }
+        });
+
+        // Quando l'utente preme "Invio" nella casella di input
+        cityInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const city = cityInput.value.trim();
+                if (city) {
+                    searchCity(city);
+                }
+            }
+        });
+
+        // Funzione principale per cercare il meteo
+        window.searchCity = async function(city) {
+            // Nascondiamo risultati precedenti
+            loading.style.display = 'block';
+            result.classList.remove('show');
+            error.classList.remove('show');
+            searchBtn.disabled = true;
+
+            try {
+                // Chiamiamo la funzione per ottenere il meteo
+                const weather = await getWeatherByCity(city);
+
+                // Mostriamo i risultati
+                document.getElementById('resultCity').textContent = weather.city;
+                document.getElementById('resultTemp').textContent = weather.temperature + '°C';
+                document.getElementById('resultDescription').textContent = weather.description;
+
+                // Mostriamo info sul cache
+                document.getElementById('cacheInfo').innerHTML = 
+                    '✅ Dati ottenuti con successo<span class="cache-badge">Da cache o API</span>';
+
+                // Mostriamo il box dei risultati
+                result.classList.add('show');
+                error.classList.remove('show');
+
+                // Puliamo l'input
+                cityInput.value = '';
+
+            } catch (err) {
+                // Se c'è un errore, lo mostriamo
+                showError(err.message || 'Errore nel recupero dei dati');
+            } finally {
+                // Nascondiamo il "caricamento"
+                loading.style.display = 'none';
+                searchBtn.disabled = false;
+            }
+        };
+
+        // Funzione per mostrare gli errori
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            error.classList.add('show');
+            result.classList.remove('show');
+            loading.style.display = 'none';
+            searchBtn.disabled = false;
+        }
+
+        // Focus automatico sulla casella di input
+        cityInput.focus();
+    </script>
+</body>
+</html>
