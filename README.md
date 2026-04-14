@@ -59,6 +59,16 @@ node src/main.js
 
 ---
 
+## 🛠️ Stack Tecnologico e Feature
+
+| Feature | Descrizione |
+|----------|----------|
+| **Logica** | JavaScript ES6+ con gestione asincrona (`async/await`) |
+| **Caching** | Sistema custom con scadenza a 24h per ottimizzare le chiamate API |
+| **Testing** | Suite di test automatizzati con **Vitest** |
+| **API** | Integrazione con Open-Meteo (Geocoding + Forecast) |
+| **UI** | Design moderno con feedback visivo e gestione errori `try/catch` |
+
 ## 3️⃣ **CLI Veloce (⚡ Consigliato per test)**
 
 ### Come usarla
@@ -90,6 +100,17 @@ node src/test.js "New York"
 ✅ Una sola riga di comando
 
 ---
+## 🤖 AI Assisted Development
+Questo progetto è stato sviluppato attraverso un workflow di collaborazione uomo-macchina:
+- **ChatGPT/Gemini:** Per il brainstorming dell'architettura e la logica del caching.
+- **GitHub Copilot:** Per la scrittura veloce dei test case in Vitest e il boilerplate della UI.
+- **Validazione:** Ogni riga di codice generata è stata revisionata e testata manualmente per garantirne la qualità.
+
+## ⚠️ Gestione degli Errori Robusta
+L'applicazione è progettata per non "rompersi" mai. Gestiamo:
+- **Città non trovata:** Feedback immediato all'utente.
+- **Assenza di rete:** Se il server non risponde, l'app avvisa l'utente senza crashare.
+- **Input non validi:** Controllo preventivo sulle stringhe inserite.
 
 ## 📊 Capire il Sistema di Caching
 
