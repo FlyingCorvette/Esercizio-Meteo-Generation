@@ -7,7 +7,7 @@ Adesso puoi inserire il nome della città e ottenere il meteo attuale! Abbiamo 3
 ### Apertura
 Naviga a questo percorso nel tuo browser:
 ```
-file:///c:/Users/user/OneDrive/Desktop/Esercizio%20Meteo/src/ui/index.html
+Per avviare l'app, apri il file index.html che si trova nella cartella src/ui/ utilizzando il tuo browser preferito.
 ```
 
 Oppure apri il file `src/ui/index.html` direttamente.
